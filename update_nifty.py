@@ -1,28 +1,35 @@
+# update_nifty.py
+
 import yfinance as yf
 import pandas as pd
-import datetime
+from datetime import datetime
 import os
 
-TICKER = "^NSEI"
-CSV_FILENAME = "mydataset.csv"
-today = datetime.date.today()
-next_day = today + datetime.timedelta(days=1)
+FILE_NAME = "NIFTY_50.xlsx"
 
-data = yf.download(TICKER, start=today, end=next_day, interval="1d")
-
-if data.empty:
-    print(f"No data for {today}. Market might be closed.")
-else:
+def fetch_nifty_data():
+    today = datetime.today().strftime('%Y-%m-%d')
+    data = yf.download("^NSEI", start=today, end=today)
+    if data.empty:
+        print("No data available for today.")
+        return None
     data.reset_index(inplace=True)
+    return data
 
-    if os.path.exists(CSV_FILENAME):
-        existing = pd.read_csv(CSV_FILENAME)
-        if today.strftime('%Y-%m-%d') in existing['Date'].values:
-            print(f"Data for {today} already exists.")
-        else:
-            updated = pd.concat([existing, data], ignore_index=True)
-            updated.to_csv(CSV_FILENAME, index=False)
-            print("Data updated.")
+def update_excel():
+    new_data = fetch_nifty_data()
+    if new_data is None:
+        return
+
+    if os.path.exists(FILE_NAME):
+        df_existing = pd.read_excel(FILE_NAME)
+        combined = pd.concat([df_existing, new_data], ignore_index=True)
+        combined.drop_duplicates(subset=["Date"], keep="last", inplace=True)
     else:
-        data.to_csv(CSV_FILENAME, index=False)
-        print("New dataset created.")
+        combined = new_data
+
+    combined.to_excel(FILE_NAME, index=False)
+    print("Excel updated successfully.")
+
+if __name__ == "__main__":
+    update_excel()
