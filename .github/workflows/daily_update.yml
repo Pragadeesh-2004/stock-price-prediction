@@ -1,33 +1,35 @@
-name: Update NIFTY 50 Data
+name: Daily NIFTY Update
 
 on:
   schedule:
-    - cron: '0 10 * * 1-5'   # Every Mon-Fri at 10:00 UTC = 3:30 PM IST (market close)
-  workflow_dispatch:         # Allow manual runs
+    - cron: '0 11 * * 1-5'  # 4:30 PM IST Mon–Fri
+  workflow_dispatch:
 
 jobs:
   update-nifty:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout repository
+    - name: Checkout repo
       uses: actions/checkout@v3
 
     - name: Set up Python
       uses: actions/setup-python@v4
       with:
-        python-version: '3.11'
+        python-version: '3.10'
 
     - name: Install dependencies
-      run: pip install yfinance pandas
+      run: |
+        pip install pandas openpyxl yfinance
 
-    - name: Run the update script
+    - name: Run update script
       run: python update_nifty.py
 
-    - name: Commit & push if changed
+    - name: Commit and push changes
       run: |
-        git config user.name "github-actions"
-        git config user.email "github-actions@github.com"
-        git add mydataset.csv
-        git commit -m "Update NIFTY 50 data [Auto]" || echo "No changes to commit"
+        git config user.name "github-actions[bot]"
+        git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+        git add NIFTY_50.xlsx
+        git commit -m "Daily NIFTY update: $(date '+%Y-%m-%d')" || echo "No changes to commit"
         git push
+
