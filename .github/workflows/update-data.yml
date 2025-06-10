@@ -20,7 +20,7 @@ jobs:
 
     - name: Install dependencies
       run: |
-        pip install pandas yfinance openpyxl
+        pip install pandas nsepy openpyxl
 
     - name: Run update script
       run: python update_nifty.py
