@@ -1,6 +1,6 @@
 # update_nifty_nsepy.py
 
-pip install nsepy pandas openpyxl
+!pip install nsepy pandas openpyxl
 
 from nsepy import get_history
 from datetime import date, datetime
